@@ -839,6 +839,35 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/debug":
+            diag = {}
+            diag["has_chrome"] = bool(CHROME_PATH and os.path.exists(CHROME_PATH))
+            diag["chrome_path"] = CHROME_PATH
+            diag["has_curl"] = bool(shutil.which("curl"))
+            test_url = "https://www.akakce.com/arama/?q=s26"
+            try:
+                p = subprocess.run(
+                    [
+                        "curl", "-sL", "-w", "\nHTTP_CODE:%{http_code}\nTIME:%{time_total}",
+                        test_url,
+                        "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                        "-H", "Accept-Language: tr-TR,tr;q=0.9",
+                        "--compressed",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                )
+                diag["curl_stdout_len"] = len(p.stdout)
+                diag["curl_stderr"] = p.stderr
+                diag["curl_tail"] = p.stdout[-200:] if len(p.stdout) > 200 else p.stdout
+                diag["curl_head"] = p.stdout[:300]
+            except Exception as e:
+                diag["curl_err"] = str(e)
+
+            self._send_json(diag)
+            return
+
         if parsed.path == "/api/info":
             tunnel_url = get_tunnel_url()
             self._send_json({
