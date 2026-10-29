@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: fiyat-avcisi-live
+    runtime: docker
+    plan: free
+    autoDeploy: true

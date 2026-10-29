@@ -11,19 +11,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Hugging Face Spaces için standart non-root kullanıcı (UID 1000)
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH \
-    CHROME_BIN=/usr/bin/chromium \
+ENV CHROME_BIN=/usr/bin/chromium \
     PYTHONUNBUFFERED=1 \
-    PORT=7860
+    PORT=10000
 
-WORKDIR $HOME/app
+WORKDIR /app
 
-COPY --chown=user:user . $HOME/app
+# Önce gereksinimleri kur (curl_cffi)
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 7860
+# Tüm kodları kopyala
+COPY . /app
+
+EXPOSE 10000
 
 CMD ["python3", "app.py"]
