@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="theme-color" content="#0B0F19" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FiyatAvcısı" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <title>FiyatAvcısı AI — En Ucuz Kombinasyon & Kupon Mobil Uygulaması</title>
+  <style>
+    :root {
+      --bg-deep: #070A12;
+      --bg-app: #0B0F19;
+      --bg-card: #131B2E;
+      --bg-card-hover: #19233C;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-active: rgba(16, 185, 129, 0.55);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --emerald: #10B981;
+      --emerald-dark: #059669;
+      --blue: #3B82F6;
+      --purple: #8B5CF6;
+      --amber: #F59E0B;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #13233F 0%, var(--bg-deep) 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+    }
+
+    .desktop-toolbar {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px 8px;
+      gap: 8px;
+    }
+    .toolbar-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .toolbar-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+    .toolbar-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .toolbar-btn {
+      background: rgba(59, 130, 246, 0.14);
+      color: #93C5FD;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .phone-shell {
+      width: 100%;
+      max-width: 430px;
+      height: calc(100vh - 54px);
+      max-height: 890px;
+      background: var(--bg-app);
+      border-radius: 42px;
+      border: 8px solid #1E293B;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    body.fullscreen-mode .desktop-toolbar {
+      max-width: 960px;
+    }
+    body.fullscreen-mode .phone-shell {
+      max-width: 960px;
+      height: calc(100vh - 54px);
+      max-height: none;
+      border-radius: 20px;
+      border-width: 2px;
+    }
+
+    @media (max-width: 520px) {
+      .desktop-toolbar {
+        display: none;
+      }
+      .phone-shell {
+        max-width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 22px 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-app);
+      z-index: 20;
+    }
+    .dynamic-island {
+      width: 96px;
+      height: 22px;
+      background: #000;
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .island-cam {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1E293B;
+    }
+    .island-led {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+    }
+
+    .app-header {
+      padding: 8px 16px 12px;
+      background: linear-gradient(180deg, rgba(16,185,129,0.08) 0%, rgba(11,15,25,0) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--emerald), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+    .brand-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--emerald);
+      font-weight: 600;
+    }
+    .qr-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Arama Kutusu */
+    .search-box {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 5px 5px 5px 12px;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .search-box:focus-within {
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 14.5px;
+      font-weight: 500;
+      outline: none;
+      min-width: 0;
+    }
+    .search-input::placeholder {
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+    .clear-input-btn {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .search-btn {
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .search-btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 9px 0 2px;
+      scrollbar-width: none;
+    }
+    .quick-chips::-webkit-scrollbar {
+      display: none;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip:hover, .chip.active {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6EE7B7;
+      border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 96px;
+      scroll-behavior: smooth;
+    }
+
+    /* Karşılama & Son Aramalar Ekranı */
+    .welcome-card {
+      background: linear-gradient(145deg, rgba(19, 27, 46, 0.95), rgba(16, 185, 129, 0.10));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .welcome-icon {
+      font-size: 34px;
+      margin-bottom: 8px;
+    }
+    .welcome-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .welcome-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .recent-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      margin-bottom: 14px;
+    }
+    .recent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 9px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+    .recent-clear {
+      background: none;
+      border: none;
+      color: #F87171;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .recent-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .recent-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 11px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Aktif Arama Bilgi Çubuğu */
+    .active-query-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+    }
+    .banner-left {
+      color: #BFDBFE;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .banner-refresh {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Hero En Ucuz Kombinasyon Kartı */
+    .combo-hero {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.20) 0%, rgba(19, 27, 46, 0.96) 55%, rgba(37, 99, 235, 0.18) 100%);
+      border: 1.5px solid var(--border-active);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .combo-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .combo-tag {
+      background: rgba(16, 185, 129, 0.22);
+      color: #6EE7B7;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .saving-pill {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .combo-product-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+    .combo-price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .net-price-big {
+      font-size: 31px;
+      font-weight: 900;
+      color: #34D399;
+      letter-spacing: -0.8px;
+    }
+    .old-price-strike {
+      font-size: 14px;
+      color: var(--text-dim);
+      text-decoration: line-through;
+      font-weight: 600;
+    }
+    .net-gain-sub {
+      width: 100%;
+      font-size: 12px;
+      color: #A7F3D0;
+      font-weight: 600;
+      margin-top: -4px;
+    }
+
+    .combo-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: rgba(7, 10, 18, 0.55);
+      border-radius: 13px;
+      padding: 11px;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      padding-bottom: 7px;
+      border-bottom: 1px dashed rgba(255,255,255,0.07);
+    }
+    .step-item:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .step-left {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.25);
+      color: #6EE7B7;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-title {
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    .step-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+    .step-amount {
+      font-weight: 800;
+      color: #34D399;
+      white-space: nowrap;
+      font-size: 12.5px;
+    }
+
+    .combo-cta-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-primary {
+      flex: 1;
+      background: var(--emerald);
+      color: #052E16;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 12.5px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 0 9px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .decision-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .decision-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .decision-verdict {
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+    .score-ring {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1.5px solid var(--emerald);
+      color: #6EE7B7;
+      font-weight: 900;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .decision-summary {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .price-range-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(0,0,0,0.28);
+      padding: 9px;
+      border-radius: 10px;
+    }
+    .range-col {
+      text-align: center;
+    }
+    .range-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-bottom: 2px;
+    }
+    .range-val {
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+
+    .store-list, .coupon-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .store-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .store-card.selected {
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.09);
+    }
+    .store-left {
+      flex: 1;
+      min-width: 0;
+    }
+    .store-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+      flex-wrap: wrap;
+    }
+    .store-name {
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+    .store-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+    }
+    .cheapest-tag {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6EE7B7;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 99px;
+    }
+    .store-title {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .store-promo {
+      font-size: 10.5px;
+      color: #93C5FD;
+    }
+    .store-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .store-price {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+    .store-orig {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: line-through;
+    }
+    .store-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--emerald);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .coupon-card {
+      background: var(--bg-card);
+      border: 1.5px dashed rgba(255,255,255,0.16);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+    }
+    .coupon-card.selected {
+      border-style: solid;
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .coupon-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .coupon-code-box {
+      font-family: "SF Mono", Menlo, monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: #FDE047;
+      background: rgba(253, 224, 71, 0.12);
+      border: 1px solid rgba(253, 224, 71, 0.3);
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+    .copy-mini-btn {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-main);
+      border: none;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .coupon-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .coupon-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .cashback-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+    }
+    .cashback-card.selected {
+      border-color: #A855F7;
+      background: rgba(168, 85, 247, 0.10);
+    }
+    .cb-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .cb-provider {
+      font-size: 13px;
+      font-weight: 800;
+      color: #E9D5FF;
+    }
+    .cb-amount {
+      font-size: 14px;
+      font-weight: 900;
+      color: #34D399;
+    }
+    .cb-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 5px;
+    }
+    .cb-howto {
+      font-size: 10.5px;
+      color: #93C5FD;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 5px 8px;
+      border-radius: 7px;
+    }
+
+    .alt-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .alt-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .alt-name {
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .alt-price {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #6EE7B7;
+      white-space: nowrap;
+    }
+    .alt-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #FDE047;
+      background: rgba(253, 224, 71, 0.12);
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-bottom: 6px;
+    }
+    .alt-reason {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .alt-try-btn {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93C5FD;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .agent-box {
+      background: linear-gradient(145deg, rgba(59, 130, 246, 0.14), rgba(19, 27, 46, 0.95));
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .agent-pre {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 11.5px;
+      color: #E2E8F0;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      margin: 8px 0 10px;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: rgba(11, 15, 25, 0.94);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 8px 14px;
+      z-index: 30;
+    }
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: var(--emerald);
+    }
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .toast {
+      position: absolute;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #10B981;
+      color: #042F2E;
+      font-weight: 800;
+      font-size: 12.5px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.22s ease;
+      z-index: 60;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .loader-wrap {
+      text-align: center;
+      padding: 36px 16px;
+      display: none;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3.5px solid rgba(16, 185, 129, 0.2);
+      border-top-color: var(--emerald);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      max-width: 360px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+    .qr-box {
+      background: #fff;
+      padding: 12px;
+      border-radius: 16px;
+      display: inline-block;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="desktop-toolbar">
+    <div class="toolbar-badge">
+      <span class="toolbar-dot"></span>
+      <span>Canlı Türkiye Fiyat & Kupon Motoru v2 Aktif</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="toolbar-btn" onclick="openMobileModal()">📲 Telefona Yükle</button>
+      <button class="toolbar-btn" onclick="toggleFrameMode()" id="frameToggleBtn">🖥️ Geniş Ekran</button>
+    </div>
+  </div>
+
+  <div class="phone-shell">
+    <div class="status-bar">
+      <span id="clockText">17:55</span>
+      <div class="dynamic-island">
+        <span class="island-cam"></span>
+        <span class="island-led"></span>
+      </div>
+      <span>5G • 100%</span>
+    </div>
+
+    <div class="app-header">
+      <div class="brand-row">
+        <div class="brand-title" onclick="resetToHome()">
+          <div class="brand-logo">🛒</div>
+          <div>
+            <div class="brand-name">FiyatAvcısı AI</div>
+            <div class="brand-sub">Mağaza + Kupon + Cashback Kombinasyonu</div>
+          </div>
+        </div>
+        <button class="qr-pill" onclick="openMobileModal()">📲 Telefonda Aç</button>
+      </div>
+
+      <!-- Arama Formu: Varsayılan olarak BOŞ başlar, ne yazarsan onu arar -->
+      <form class="search-box" onsubmit="handleSearchSubmit(event)">
+        <input
+          type="search"
+          id="productInput"
+          class="search-input"
+          placeholder="Alacağın ürünün adını veya linkini yaz..."
+          value=""
+          enterkeyhint="search"
+          autocomplete="off"
+          oninput="toggleClearBtn()"
+        />
+        <button type="button" class="clear-input-btn" id="clearInputBtn" onclick="clearSearchInput()">✕</button>
+        <button type="submit" class="search-btn" id="searchBtn">
+          <span>🔍</span>
+          <span>Avla</span>
+        </button>
+      </form>
+
+      <div class="quick-chips">
+        <button class="chip" onclick="quickSearch('Stanley Termos', this)">🥤 Stanley Termos</button>
+        <button class="chip" onclick="quickSearch('Philips Airfryer', this)">🍟 Philips Airfryer</button>
+        <button class="chip" onclick="quickSearch('Nike Air Force 1', this)">👟 Nike Air Force 1</button>
+        <button class="chip" onclick="quickSearch('Samsung S24 Ultra', this)">📱 Samsung S24 Ultra</button>
+        <button class="chip" onclick="quickSearch('PlayStation 5 Slim', this)">🎮 PS5 Slim</button>
+        <button class="chip" onclick="quickSearch('Logitech G Pro X', this)">🎧 Logitech G Pro X</button>
+        <button class="chip" onclick="quickSearch('Adidas Samba OG', this)">👟 Adidas Samba OG</button>
+      </div>
+    </div>
+
+    <div class="app-content" id="appContent">
+      <!-- Karşılama & Son Aramalar Görünümü (Açılışta otomatik ürün dayatmaz) -->
+      <div id="welcomeView">
+        <div class="welcome-card">
+          <div class="welcome-icon">🎯</div>
+          <div class="welcome-title">Ne Satın Almak Üzeresin?</div>
+          <div class="welcome-desc">
+            Yukarıdaki kutuya <strong>istediğin ürünün adını</strong> (ör. <em>"Stanley Termos"</em>, <em>"Casio Saat"</em>, <em>"Airfryer"</em>) veya mağaza linkini yazıp <strong>Avla</strong>'ya dokun.<br/><br/>
+            Amazon TR, Pazarama, Vatan, Evidea, Akakçe, Trendyol ve Hepsiburada fiyatlarını canlı tarayıp <strong>kupon + Nays/Banka iadesi</strong> ile en ucuz kombinasyonu çıkaralım.
+          </div>
+        </div>
+
+        <div class="recent-box" id="recentSearchesBox" style="display: none;">
+          <div class="recent-header">
+            <span>🕒 Son Aramaların</span>
+            <button class="recent-clear" onclick="clearRecentSearches()">Temizle</button>
+          </div>
+          <div class="recent-items" id="recentSearchesList"></div>
+        </div>
+      </div>
+
+      <!-- Yükleniyor Görünümü -->
+      <div class="loader-wrap" id="loaderView">
+        <div class="spinner"></div>
+        <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;" id="loaderTitle">Ürün Taranıyor...</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Türkiye mağazaları, indirim kodları ve Nays/Banka cashback fırsatları canlı hesaplanıyor</div>
+      </div>
+
+      <!-- Sonuçlar Görünümü -->
+      <div id="resultsView" style="display: none;">
+        <div class="active-query-banner">
+          <div class="banner-left" id="activeBannerText">🔎 Aranan: —</div>
+          <button class="banner-refresh" onclick="refreshCurrentQuery()">🔄 Yenile</button>
+        </div>
+
+        <div class="combo-hero" id="sec-combo">
+          <div class="combo-top-row">
+            <span class="combo-tag">🏆 En Ucuz Kombinasyon</span>
+            <span class="saving-pill" id="heroSavingPct">%0 Avantaj</span>
+          </div>
+          <div class="combo-product-title" id="heroProductTitle">Ürün</div>
+          <div class="combo-price-box">
+            <span class="net-price-big" id="heroNetPrice">0 TL</span>
+            <span class="old-price-strike" id="heroOldPrice">0 TL</span>
+            <div class="net-gain-sub" id="heroTotalGainText">Toplam 0 TL cebinde kalıyor!</div>
+          </div>
+
+          <div class="combo-steps" id="comboStepsList"></div>
+
+          <div class="combo-cta-row">
+            <a href="#" target="_blank" rel="noopener" class="btn-primary" id="heroStoreBtn">
+              <span>Mağazaya Git</span>
+              <span>↗</span>
+            </a>
+            <button class="btn-secondary" onclick="copyBestCoupon()">
+              <span>🎟️ Kodu Kopyala</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="decision-card" id="sec-decision">
+          <div class="decision-top">
+            <div class="decision-verdict" id="decisionVerdict">🔥 HEMEN AL</div>
+            <div class="score-ring" id="decisionScore">92/100</div>
+          </div>
+          <div class="decision-summary" id="decisionSummary"></div>
+          <div class="price-range-bar">
+            <div class="range-col">
+              <div class="range-label">En Düşük</div>
+              <div class="range-val" style="color: #34D399;" id="rangeLow">0 TL</div>
+            </div>
+            <div class="range-col">
+              <div class="range-label">Piyasa Ort.</div>
+              <div class="range-val" style="color: #FBBF24;" id="rangeAvg">0 TL</div>
+            </div>
+            <div class="range-col">
+              <div class="range-label">En Yüksek</div>
+              <div class="range-val" style="color: #F87171;" id="rangeHigh">0 TL</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header" id="sec-stores">
+          <div class="section-title">🏪 Canlı Mağaza Fiyatları</div>
+          <div class="section-hint">Seçmek için mağazaya dokun</div>
+        </div>
+        <div class="store-list" id="storesList"></div>
+
+        <div class="section-header" id="sec-coupons">
+          <div class="section-title">🎟️ İndirim Kodları & Kuponlar</div>
+          <div class="section-hint">Kombinasyona eklemek için dokun</div>
+        </div>
+        <div class="coupon-list" id="couponsList"></div>
+
+        <div class="section-header" id="sec-cashback">
+          <div class="section-title">💳 Cashback & Kart İadesi</div>
+          <div class="section-hint">Kullandığın kartı seç</div>
+        </div>
+        <div class="coupon-list" id="cashbacksList"></div>
+
+        <div class="section-header" id="sec-alts">
+          <div class="section-title">🔄 Alternatif Teklif & Modeller</div>
+          <div class="section-hint">Tek tıkla incele</div>
+        </div>
+        <div id="alternativesList"></div>
+
+        <div class="agent-box" id="sec-agent">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13.5px; font-weight:800;">🤖 ChatGPT Ödeme Ajanı Komutu</div>
+            <span style="font-size:10.5px; color:#93C5FD; font-weight:700;">Videodaki Yöntem Pro</span>
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
+            Bulunan mağaza linki ve kupon kodları bu komuta otomatik yerleştirildi:
+          </div>
+          <div class="agent-pre" id="agentPromptText"></div>
+          <div class="combo-cta-row">
+            <button class="btn-primary" onclick="copyAgentPrompt(false)">📋 Komutu Kopyala</button>
+            <button class="btn-secondary" onclick="copyAgentPrompt(true)">🚀 ChatGPT'de Aç</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toastMsg">Kopyalandı!</div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="scrollToSection('sec-combo', this)">
+        <span class="nav-icon">🏆</span>
+        <span>Kombinasyon</span>
+      </button>
+      <button class="nav-item" onclick="scrollToSection('sec-stores', this)">
+        <span class="nav-icon">🏪</span>
+        <span>Mağazalar</span>
+      </button>
+      <button class="nav-item" onclick="scrollToSection('sec-coupons', this)">
+        <span class="nav-icon">🎟️</span>
+        <span>Kupon & İade</span>
+      </button>
+      <button class="nav-item" onclick="scrollToSection('sec-alts', this)">
+        <span class="nav-icon">🔄</span>
+        <span>Alternatif & AI</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop" id="mobileModal" onclick="if(event.target===this)closeMobileModal()">
+    <div class="modal-card">
+      <div style="font-size:17px; font-weight:800; margin-bottom:6px;">📱 Telefonunda Aç & Kur</div>
+      <div style="font-size:12px; color:var(--text-muted); line-height:1.45;">
+        Telefonunun kamerasıyla aşağıdaki QR kodu okut veya adresi aç:
+      </div>
+      <div class="qr-box">
+        <img id="qrImage" src="" alt="QR Kod" width="165" height="165" style="display:block;" />
+      </div>
+      <div id="mobileUrlText" style="font-family:monospace; font-size:11.5px; font-weight:800; color:#34D399; margin-bottom:10px; word-break:break-all;">
+        https://raised-behaviour-template-pixel.trycloudflare.com
+      </div>
+      <button class="btn-primary" style="width:100%;" onclick="closeMobileModal()">Tamam</button>
+    </div>
+  </div>
+
+  <script>
+    const PERMANENT_MOBILE_URL = 'https://advert-sip-sandra-bin.trycloudflare.com';
+    const RECENT_STORAGE_KEY = 'fiyat_avcisi_recent_v2';
+
+    let currentData = null;
+    let selectedOfferIdx = 0;
+    let selectedCouponIdx = 0;
+    let selectedCashbackIdx = 0;
+
+    function formatTL(num) {
+      return Math.round(Number(num || 0)).toLocaleString('tr-TR') + ' TL';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2300);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clockText').textContent = `${hh}:${mm}`;
+    }
+    setInterval(updateClock, 15000);
+    updateClock();
+
+    function loadServerInfo() {
+      document.getElementById('mobileUrlText').textContent = PERMANENT_MOBILE_URL;
+      document.getElementById('qrImage').src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(PERMANENT_MOBILE_URL);
+    }
+
+    // Eski önbellekleri temizleyip yeni Service Worker'ı kaydet
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js?v=4').then(reg => {
+        reg.update();
+      }).catch(() => {});
+    }
+
+    function toggleClearBtn() {
+      const val = document.getElementById('productInput').value;
+      document.getElementById('clearInputBtn').style.display = val.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    function clearSearchInput() {
+      const inp = document.getElementById('productInput');
+      inp.value = '';
+      toggleClearBtn();
+      inp.focus();
+    }
+
+    function resetToHome() {
+      document.getElementById('loaderView').style.display = 'none';
+      document.getElementById('resultsView').style.display = 'none';
+      document.getElementById('welcomeView').style.display = 'block';
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      renderRecentSearches();
+    }
+
+    function getRecentSearches() {
+      try {
+        return JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveRecentSearch(q) {
+      const clean = q.trim();
+      if (!clean) return;
+      let list = getRecentSearches().filter(item => item.toLowerCase() !== clean.toLowerCase());
+      list.unshift(clean);
+      list = list.slice(0, 8);
+      try {
+        localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+      renderRecentSearches();
+    }
+
+    function clearRecentSearches() {
+      try {
+        localStorage.removeItem(RECENT_STORAGE_KEY);
+      } catch (e) {}
+      renderRecentSearches();
+    }
+
+    function renderRecentSearches() {
+      const list = getRecentSearches();
+      const box = document.getElementById('recentSearchesBox');
+      const container = document.getElementById('recentSearchesList');
+      if (!list.length) {
+        box.style.display = 'none';
+        return;
+      }
+      box.style.display = 'block';
+      container.innerHTML = list
+        .map(
+          item => `
+        <button class="recent-pill" onclick="quickSearch('${item.replace(/'/g, "\\'")}', null)">
+          <span>🔍</span>
+          <span>${item}</span>
+        </button>`
+        )
+        .join('');
+    }
+
+    function openMobileModal() {
+      document.getElementById('mobileModal').classList.add('open');
+    }
+    function closeMobileModal() {
+      document.getElementById('mobileModal').classList.remove('open');
+    }
+
+    function toggleFrameMode() {
+      document.body.classList.toggle('fullscreen-mode');
+      const isFull = document.body.classList.contains('fullscreen-mode');
+      document.getElementById('frameToggleBtn').textContent = isFull ? '📱 Telefon Görünümü' : '🖥️ Geniş Ekran';
+    }
+
+    function scrollToSection(id, btn) {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function quickSearch(queryText, chipEl) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      if (chipEl) chipEl.classList.add('active');
+      const inp = document.getElementById('productInput');
+      inp.value = queryText;
+      toggleClearBtn();
+      runAnalysis(queryText);
+    }
+
+    function refreshCurrentQuery() {
+      const q = document.getElementById('productInput').value.trim() || (currentData && currentData.query);
+      if (q) runAnalysis(q);
+    }
+
+    function handleSearchSubmit(e) {
+      e.preventDefault();
+      const inp = document.getElementById('productInput');
+      const q = inp.value.trim();
+      if (!q) {
+        showToast('Lütfen aramak istediğin ürünün adını yaz');
+        inp.focus();
+        return;
+      }
+      inp.blur(); // Mobil klavyeyi kapat
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      runAnalysis(q);
+    }
+
+    async function runAnalysis(query) {
+      const cleanQuery = query.trim();
+      if (!cleanQuery) return;
+
+      saveRecentSearch(cleanQuery);
+
+      const welcome = document.getElementById('welcomeView');
+      const loader = document.getElementById('loaderView');
+      const results = document.getElementById('resultsView');
+      const btn = document.getElementById('searchBtn');
+
+      welcome.style.display = 'none';
+      loader.style.display = 'block';
+      results.style.display = 'none';
+      document.getElementById('loaderTitle').textContent = `"${cleanQuery}" İçin En Ucuz Kombinasyon Aranıyor...`;
+      btn.disabled = true;
+
+      const ts = Date.now();
+      const apiPath = `/api/analyze?q=${encodeURIComponent(cleanQuery)}&_t=${ts}`;
+
+      let data = null;
+      const urlsToTry = [apiPath, PERMANENT_MOBILE_URL + apiPath];
+
+      for (const u of urlsToTry) {
+        try {
+          const resp = await fetch(u, { cache: 'no-store' });
+          const ctype = resp.headers.get('content-type') || '';
+          if (resp.ok && ctype.includes('application/json')) {
+            const parsed = await resp.json();
+            if (parsed && parsed.ok) {
+              data = parsed;
+              break;
+            }
+          }
+        } catch (err) {}
+      }
+
+      btn.disabled = false;
+
+      if (!data) {
+        loader.style.display = 'none';
+        welcome.style.display = 'block';
+        showToast('Sunucuya ulaşılamadı, lütfen tekrar dene');
+        return;
+      }
+
+      currentData = data;
+      selectedOfferIdx = 0;
+      selectedCouponIdx = 0;
+      selectedCashbackIdx = 0;
+      renderAll();
+      loader.style.display = 'none';
+      results.style.display = 'block';
+      document.getElementById('appContent').scrollTop = 0;
+    }
+
+    function recalculateCombination() {
+      if (!currentData || !currentData.offers.length) return;
+      const offer = currentData.offers[selectedOfferIdx] || currentData.offers[0];
+      const coupon = selectedCouponIdx >= 0 ? currentData.coupons[selectedCouponIdx] : null;
+      const cashback = selectedCashbackIdx >= 0 ? currentData.cashbacks[selectedCashbackIdx] : null;
+
+      const basePrice = offer.price;
+      const highestMarket = Math.max(
+        currentData.decision.highest_market_price || basePrice * 1.18,
+        offer.original_price || 0,
+        basePrice * 1.15
+      );
+
+      let couponSaving = 0;
+      if (coupon) {
+        if (coupon.discount_type === 'percent') {
+          const cap = basePrice > 15000 ? 1500 : 750;
+          couponSaving = Math.min(Math.round(basePrice * (coupon.discount_value / 100)), cap);
+        } else {
+          couponSaving = coupon.discount_value;
+        }
+      }
+
+      const afterCoupon = Math.max(basePrice - couponSaving, 0);
+      const cbSaving = cashback ? cashback.cashback_amount : 0;
+      const netPrice = Math.max(afterCoupon - cbSaving, 0);
+      const totalGain = Math.max(highestMarket - netPrice, 0);
+      const gainPct = highestMarket > 0 ? ((totalGain / highestMarket) * 100).toFixed(1) : '0';
+
+      document.getElementById('heroProductTitle').textContent =
+        `${currentData.query} — ${offer.store_name}`;
+      document.getElementById('heroNetPrice').textContent = formatTL(netPrice);
+      document.getElementById('heroOldPrice').textContent = formatTL(highestMarket);
+      document.getElementById('heroSavingPct').textContent = `%${gainPct} Avantaj`;
+      document.getElementById('heroTotalGainText').textContent =
+        `Piyasa tavan fiyatına göre toplam ${formatTL(totalGain)} cebinde kalıyor!`;
+      document.getElementById('heroStoreBtn').href = offer.url;
+
+      const stepsHtml = [
+        {
+          num: 1,
+          title: `${offer.store_name} Teklifini Seç`,
+          desc: `${offer.title} (${offer.shipping})`,
+          amount: formatTL(basePrice),
+        },
+        {
+          num: 2,
+          title: coupon ? `Kupon Kodu: ${coupon.code}` : 'Kupon Seçilmedi',
+          desc: coupon ? `${coupon.title} — ${coupon.verified_status}` : 'Aşağıdan bir indirim kodu seçebilirsin.',
+          amount: couponSaving > 0 ? `-${formatTL(couponSaving)}` : '0 TL',
+        },
+        {
+          num: 3,
+          title: cashback ? `${cashback.provider} ile Öde` : 'Cashback Seçilmedi',
+          desc: cashback ? cashback.how_to : 'Aşağıdan kart kampanyası seçebilirsin.',
+          amount: cbSaving > 0 ? `-${formatTL(cbSaving)}` : '0 TL',
+        },
+      ]
+        .map(
+          s => `
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">${s.num}</div>
+            <div>
+              <div class="step-title">${s.title}</div>
+              <div class="step-desc">${s.desc}</div>
+            </div>
+          </div>
+          <div class="step-amount">${s.amount}</div>
+        </div>`
+        )
+        .join('');
+      document.getElementById('comboStepsList').innerHTML = stepsHtml;
+    }
+
+    function renderAll() {
+      if (!currentData) return;
+
+      document.getElementById('activeBannerText').textContent =
+        `🔎 "${currentData.query}" • ${currentData.offers.length} Mağaza (${currentData.elapsed_seconds || 1.2} sn)`;
+
+      const d = currentData.decision;
+      document.getElementById('decisionVerdict').textContent = d.verdict;
+      document.getElementById('decisionScore').textContent = `${d.score}/100 Puan`;
+      document.getElementById('decisionSummary').textContent = d.summary;
+      document.getElementById('rangeLow').textContent = formatTL(d.lowest_market_price);
+      document.getElementById('rangeAvg').textContent = formatTL(d.average_market_price);
+      document.getElementById('rangeHigh').textContent = formatTL(d.highest_market_price);
+
+      const storesHtml = currentData.offers
+        .map(
+          (o, idx) => `
+        <div class="store-card ${idx === selectedOfferIdx ? 'selected' : ''}" onclick="selectStore(${idx})">
+          <div class="store-left">
+            <div class="store-name-row">
+              <span class="store-name">${o.store_name}</span>
+              <span class="store-badge">${o.badge}</span>
+              ${idx === 0 ? '<span class="cheapest-tag">EN UCUZ</span>' : ''}
+            </div>
+            <div class="store-title">${o.title}</div>
+            <div class="store-promo">✨ ${o.app_promo}</div>
+          </div>
+          <div class="store-right">
+            <div class="store-price">${formatTL(o.price)}</div>
+            ${o.original_price ? `<div class="store-orig">${formatTL(o.original_price)}</div>` : ''}
+            <a href="${o.url}" target="_blank" rel="noopener" class="store-link" onclick="event.stopPropagation()">Mağazaya Git ↗</a>
+          </div>
+        </div>`
+        )
+        .join('');
+      document.getElementById('storesList').innerHTML = storesHtml;
+
+      const couponsHtml = currentData.coupons
+        .map(
+          (c, idx) => `
+        <div class="coupon-card ${idx === selectedCouponIdx ? 'selected' : ''}" onclick="selectCoupon(${idx})">
+          <div class="coupon-top">
+            <span class="coupon-code-box">${c.code}</span>
+            <button class="copy-mini-btn" onclick="event.stopPropagation(); copyText('${c.code}', 'Kupon kodu kopyalandı: ${c.code}')">📋 Kopyala</button>
+          </div>
+          <div class="coupon-title">${c.title}</div>
+          <div class="coupon-meta">✅ ${c.verified_status} • Kaynak: ${c.source}</div>
+        </div>`
+        )
+        .join('');
+      document.getElementById('couponsList').innerHTML = couponsHtml;
+
+      const cbHtml = currentData.cashbacks
+        .map(
+          (cb, idx) => `
+        <div class="cashback-card ${idx === selectedCashbackIdx ? 'selected' : ''}" onclick="selectCashback(${idx})">
+          <div class="cb-top">
+            <span class="cb-provider">${cb.provider}</span>
+            <span class="cb-amount">-${formatTL(cb.cashback_amount)} İade</span>
+          </div>
+          <div class="cb-desc">${cb.description}</div>
+          <div class="cb-howto">💡 ${cb.how_to}</div>
+        </div>`
+        )
+        .join('');
+      document.getElementById('cashbacksList').innerHTML = cbHtml;
+
+      const altsHtml = currentData.alternatives
+        .map(
+          a => `
+        <div class="alt-card">
+          <div class="alt-top">
+            <div class="alt-name">${a.name}</div>
+            <div class="alt-price">${a.estimated_price}</div>
+          </div>
+          <div class="alt-badge">⭐ ${a.badge}</div>
+          <div class="alt-reason">${a.reason}</div>
+          <button class="alt-try-btn" onclick="quickSearch('${a.search_query.replace(/'/g, '')}', null)">
+            🔍 Bu Modeli Avla →
+          </button>
+        </div>`
+        )
+        .join('');
+      document.getElementById('alternativesList').innerHTML = altsHtml;
+
+      document.getElementById('agentPromptText').textContent = currentData.agent_prompt;
+      recalculateCombination();
+    }
+
+    function selectStore(idx) {
+      selectedOfferIdx = idx;
+      renderAll();
+      showToast(`${currentData.offers[idx].store_name} seçildi`);
+    }
+
+    function selectCoupon(idx) {
+      selectedCouponIdx = selectedCouponIdx === idx ? -1 : idx;
+      renderAll();
+      if (selectedCouponIdx >= 0) {
+        const code = currentData.coupons[selectedCouponIdx].code;
+        copyText(code, `Kupon uygulandı & kopyalandı: ${code}`);
+      } else {
+        showToast('Kupon devre dışı bırakıldı');
+      }
+    }
+
+    function selectCashback(idx) {
+      selectedCashbackIdx = selectedCashbackIdx === idx ? -1 : idx;
+      renderAll();
+      if (selectedCashbackIdx >= 0) {
+        showToast(`${currentData.cashbacks[idx].provider} kombinasyona eklendi`);
+      } else {
+        showToast('Cashback devre dışı bırakıldı');
+      }
+    }
+
+    function copyText(text, toastMessage) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      showToast(toastMessage || 'Kopyalandı!');
+    }
+
+    function copyBestCoupon() {
+      if (!currentData || !currentData.coupons.length) return;
+      const idx = selectedCouponIdx >= 0 ? selectedCouponIdx : 0;
+      const c = currentData.coupons[idx];
+      copyText(c.code, `Kupon Kodu Kopyalandı: ${c.code}`);
+    }
+
+    function copyAgentPrompt(openChatGpt) {
+      if (!currentData) return;
+      copyText(currentData.agent_prompt, 'Ödeme Ajanı komutu kopyalandı!');
+      if (openChatGpt) {
+        setTimeout(() => {
+          window.open('https://chatgpt.com/?q=' + encodeURIComponent(currentData.agent_prompt), '_blank');
+        }, 350);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadServerInfo();
+      renderRecentSearches();
+      // Eğer URL'de ?q=... parametresi varsa onu ara, yoksa temiz karşılama ekranında başla!
+      const params = new URLSearchParams(window.location.search);
+      const initialQ = params.get('q');
+      if (initialQ && initialQ.trim()) {
+        document.getElementById('productInput').value = initialQ.trim();
+        toggleClearBtn();
+        runAnalysis(initialQ.trim());
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# Fiyat Avcısı AI - 100% Python Standard Library
+# Harici pip kütüphanesi gerektirmez.

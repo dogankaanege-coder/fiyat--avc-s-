@@ -1,0 +1,6 @@
+cloudflared
+tunnel_url.txt
+__pycache__
+*.pyc
+.git
+.DS_Store

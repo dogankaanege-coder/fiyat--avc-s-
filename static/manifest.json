@@ -1,0 +1,18 @@
+{
+  "name": "FiyatAvcısı AI - En Ucuz Kombinasyon & Kupon",
+  "short_name": "FiyatAvcısı",
+  "description": "Ürün adını veya linkini yaz; tüm mağazaları, aktif indirim kodlarını ve Nays/Papara/Banka cashback fırsatlarını birleştirip en ucuz kombinasyonu çıkarsın.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
