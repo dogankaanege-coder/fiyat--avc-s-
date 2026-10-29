@@ -844,27 +844,39 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
             diag["has_chrome"] = bool(CHROME_PATH and os.path.exists(CHROME_PATH))
             diag["chrome_path"] = CHROME_PATH
             diag["has_curl"] = bool(shutil.which("curl"))
-            test_url = "https://www.akakce.com/arama/?q=s26"
-            try:
-                p = subprocess.run(
-                    [
-                        "curl", "-sL", "-w", "\nHTTP_CODE:%{http_code}\nTIME:%{time_total}",
-                        test_url,
-                        "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-                        "-H", "Accept-Language: tr-TR,tr;q=0.9",
-                        "--compressed",
-                    ],
-                    capture_output=True,
-                    text=True,
-                    timeout=15,
-                )
-                diag["curl_stdout_len"] = len(p.stdout)
-                diag["curl_stderr"] = p.stderr
-                diag["curl_tail"] = p.stdout[-200:] if len(p.stdout) > 200 else p.stdout
-                diag["curl_head"] = p.stdout[:300]
-            except Exception as e:
-                diag["curl_err"] = str(e)
+            
+            # Test Akakce, Cimri, Amazon, Pazarama
+            test_sites = {
+                "akakce": "https://www.akakce.com/arama/?q=s26",
+                "cimri": "https://www.cimri.com/arama?q=s26",
+                "amazon": "https://www.amazon.com.tr/s?k=s26",
+                "pazarama": "https://www.pazarama.com/arama?q=s26",
+            }
+            results = {}
+            for name, u in test_sites.items():
+                try:
+                    p = subprocess.run(
+                        [
+                            "curl", "-sL", "-w", "\nHTTP_CODE:%{http_code}",
+                            u,
+                            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                            "-H", "Accept-Language: tr-TR,tr;q=0.9",
+                            "--compressed",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=8,
+                    )
+                    code = re.search(r"HTTP_CODE:([0-9]+)", p.stdout)
+                    results[name] = {
+                        "code": code.group(1) if code else "none",
+                        "len": len(p.stdout),
+                        "is_cf": "Just a moment" in p.stdout or "Attention Required" in p.stdout or "Cloudflare" in p.stdout,
+                    }
+                except Exception as e:
+                    results[name] = {"err": str(e)}
 
+            diag["sites"] = results
             self._send_json(diag)
             return
 
