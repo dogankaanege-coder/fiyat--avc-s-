@@ -875,26 +875,29 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
                 "has_curl": bool(shutil.which("curl")),
                 "port": PORT,
             }
-            # Test direct scrape_akakce and scrape_trendyol
-            test_ak = "https://www.akakce.com/arama/?q=s26"
-            try:
-                r = cffi_requests.get(test_ak, impersonate="chrome124", timeout=10)
-                diag["ak_code"] = r.status_code
-                diag["ak_len"] = len(r.text)
-                diag["ak_head"] = r.text[:200]
-                diag["ak_is_cf"] = "Just a moment" in r.text or "Cloudflare" in r.text
-            except Exception as e:
-                diag["ak_err"] = str(e)
-
-            test_ty = "https://www.trendyol.com/sr?q=s26"
-            try:
-                r2 = cffi_requests.get(test_ty, impersonate="chrome124", timeout=10)
-                diag["ty_code"] = r2.status_code
-                diag["ty_len"] = len(r2.text)
-                diag["ty_head"] = r2.text[:200]
-                diag["ty_is_cf"] = "Attention Required" in r2.text or "Cloudflare" in r2.text
-            except Exception as e:
-                diag["ty_err"] = str(e)
+            if CHROME_PATH and os.path.exists(CHROME_PATH):
+                try:
+                    p = subprocess.run(
+                        [
+                            CHROME_PATH,
+                            "--headless=new",
+                            "--disable-gpu",
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",
+                            "--user-data-dir=/tmp/chr_debug",
+                            "--dump-dom",
+                            "https://www.akakce.com/arama/?q=s26",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=15,
+                    )
+                    diag["chrome_ret"] = p.returncode
+                    diag["chrome_len"] = len(p.stdout)
+                    diag["chrome_err"] = p.stderr[:500]
+                    diag["chrome_head"] = p.stdout[:200]
+                except Exception as e:
+                    diag["chrome_exc"] = str(e)
 
             self._send_json(diag)
             return
