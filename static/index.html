@@ -1227,7 +1227,9 @@
   </div>
 
   <script>
-    const PERMANENT_MOBILE_URL = 'https://advert-sip-sandra-bin.trycloudflare.com';
+    const PERMANENT_MOBILE_URL = (window.location.origin && window.location.origin.startsWith('http'))
+      ? window.location.origin
+      : 'https://advert-sip-sandra-bin.trycloudflare.com';
     const RECENT_STORAGE_KEY = 'fiyat_avcisi_recent_v2';
 
     let currentData = null;

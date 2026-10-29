@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Install Chromium and dependencies for headless web scraping
+# Chromium ve headless tarayıcı bağımlılıkları
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     chromium-driver \
@@ -11,14 +11,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     && rm -rf /var/lib/apt/lists/*
 
-ENV CHROME_BIN=/usr/bin/chromium \
+# Hugging Face Spaces için standart non-root kullanıcı (UID 1000)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    CHROME_BIN=/usr/bin/chromium \
     PYTHONUNBUFFERED=1 \
-    PORT=8080
+    PORT=7860
 
-WORKDIR /app
+WORKDIR $HOME/app
 
-COPY . /app
+COPY --chown=user:user . $HOME/app
 
-EXPOSE 8080
+EXPOSE 7860
 
 CMD ["python3", "app.py"]

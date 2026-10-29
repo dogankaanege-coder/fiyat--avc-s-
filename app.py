@@ -78,12 +78,14 @@ MODEL_VARIANT_TOKENS = {"fe", "lite", "mini", "se", "plus", "ultra", "pro", "max
 
 
 def get_tunnel_url() -> str:
+    if os.environ.get("SPACE_HOST"):
+        return f"https://{os.environ.get('SPACE_HOST')}"
     if TUNNEL_FILE.exists():
         try:
             return TUNNEL_FILE.read_text().strip()
         except Exception:
             pass
-    return "https://twisted-welfare-thinks-editor.trycloudflare.com"
+    return "https://advert-sip-sandra-bin.trycloudflare.com"
 
 
 def get_local_ip() -> str:
