@@ -147,20 +147,44 @@ def curl_fetch(url: str, timeout: int = 7) -> str:
 
 
 def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
-    if not os.path.exists(CHROME_PATH):
-        return ""
+    # 1. Google Chrome kuruluysa headless modda çalıştır
+    if CHROME_PATH and os.path.exists(CHROME_PATH):
+        try:
+            out = subprocess.check_output(
+                [
+                    CHROME_PATH,
+                    "--headless=new",
+                    "--disable-gpu",
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--blink-settings=imagesEnabled=false",
+                    "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                    "--dump-dom",
+                    url,
+                ],
+                stderr=subprocess.DEVNULL,
+                timeout=timeout,
+            )
+            res = out.decode("utf-8", errors="ignore")
+            if len(res) > 500:
+                return res
+        except Exception:
+            pass
+
+    # 2. Chrome yoksa (örn. Render bulut sunucusu) curl ile doğrudan hızlı çek
     try:
         out = subprocess.check_output(
             [
-                CHROME_PATH,
-                "--headless=new",
-                "--disable-gpu",
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--blink-settings=imagesEnabled=false",
-                "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-                "--dump-dom",
+                "curl",
+                "-sL",
                 url,
+                "-H",
+                "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                "-H",
+                "Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+                "-H",
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "--compressed",
             ],
             stderr=subprocess.DEVNULL,
             timeout=timeout,
