@@ -18,6 +18,7 @@ import subprocess
 import time
 import urllib.parse
 import shutil
+import tempfile
 from pathlib import Path
 
 try:
@@ -175,8 +176,9 @@ def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
         except Exception:
             pass
 
-    # 2. Google Chrome kuruluysa headless modda çalıştır (Yerel Mac için)
+    # 2. Google Chrome / Chromium kuruluysa headless modda çalıştır (Çoklu işlem için izole profil)
     if CHROME_PATH and os.path.exists(CHROME_PATH):
+        tmp_prof = tempfile.mkdtemp(prefix="chr_prof_")
         try:
             out = subprocess.check_output(
                 [
@@ -185,7 +187,13 @@ def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
                     "--disable-gpu",
                     "--no-sandbox",
                     "--disable-dev-shm-usage",
+                    f"--user-data-dir={tmp_prof}",
+                    "--no-first-run",
+                    "--incognito",
                     "--blink-settings=imagesEnabled=false",
+                    "--disable-remote-fonts",
+                    "--disable-background-networking",
+                    "--disable-software-rasterizer",
                     "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
                     "--dump-dom",
                     url,
@@ -194,10 +202,12 @@ def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
                 timeout=timeout,
             )
             res = out.decode("utf-8", errors="ignore")
-            if len(res) > 500:
+            if len(res) > 500 and "Just a moment" not in res:
                 return res
         except Exception:
             pass
+        finally:
+            shutil.rmtree(tmp_prof, ignore_errors=True)
 
     # 3. Chrome yoksa (örn. Render bulut sunucusu) curl ile doğrudan hızlı çek
     try:
@@ -296,7 +306,7 @@ def is_relevant_product(title: str, query: str) -> bool:
 def scrape_akakce(query: str) -> list:
     """Akakçe'den canlı en ucuz satıcı ve fiyatları çeker."""
     url = "https://www.akakce.com/arama/?q=" + urllib.parse.quote(query)
-    raw = fetch_chrome_dom(url, timeout=10)
+    raw = fetch_chrome_dom(url, timeout=18)
     if not raw:
         return []
     blocks = re.split(r"<li[^>]+data-pr=", raw)[1:]
@@ -337,7 +347,7 @@ def scrape_akakce(query: str) -> list:
 def scrape_trendyol(query: str) -> list:
     """Trendyol'dan canlı ürün ve fiyatları çeker."""
     url = "https://www.trendyol.com/sr?q=" + urllib.parse.quote(query)
-    raw = fetch_chrome_dom(url, timeout=10)
+    raw = fetch_chrome_dom(url, timeout=18)
     if not raw:
         return []
     links = re.findall(r'<a[^>]+href="(/[^\"]+-p-[0-9]+[^\"]*)"[^>]*>(.*?)</a>', raw, re.S)
@@ -876,6 +886,7 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
                 "port": PORT,
             }
             if CHROME_PATH and os.path.exists(CHROME_PATH):
+                tmp_dbg = tempfile.mkdtemp(prefix="chr_dbg_")
                 try:
                     p = subprocess.run(
                         [
@@ -884,13 +895,18 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
                             "--disable-gpu",
                             "--no-sandbox",
                             "--disable-dev-shm-usage",
-                            "--user-data-dir=/tmp/chr_debug",
+                            f"--user-data-dir={tmp_dbg}",
+                            "--no-first-run",
+                            "--incognito",
+                            "--blink-settings=imagesEnabled=false",
+                            "--disable-remote-fonts",
+                            "--disable-background-networking",
                             "--dump-dom",
                             "https://www.akakce.com/arama/?q=s26",
                         ],
                         capture_output=True,
                         text=True,
-                        timeout=15,
+                        timeout=20,
                     )
                     diag["chrome_ret"] = p.returncode
                     diag["chrome_len"] = len(p.stdout)
@@ -898,6 +914,8 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
                     diag["chrome_head"] = p.stdout[:200]
                 except Exception as e:
                     diag["chrome_exc"] = str(e)
+                finally:
+                    shutil.rmtree(tmp_dbg, ignore_errors=True)
 
             self._send_json(diag)
             return
