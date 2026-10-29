@@ -20,6 +20,13 @@ import urllib.parse
 import shutil
 from pathlib import Path
 
+try:
+    from curl_cffi import requests as cffi_requests
+    HAS_CURL_CFFI = True
+except Exception:
+    cffi_requests = None
+    HAS_CURL_CFFI = False
+
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 TUNNEL_FILE = BASE_DIR / "tunnel_url.txt"
@@ -147,7 +154,28 @@ def curl_fetch(url: str, timeout: int = 7) -> str:
 
 
 def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
-    # 1. Google Chrome kuruluysa headless modda çalıştır
+    # 1. curl_cffi: Gerçek Chrome TLS parmak iziyle Cloudflare'i anında geçer (Render & Cloud için mükemmel)
+    if HAS_CURL_CFFI and cffi_requests:
+        try:
+            r = cffi_requests.get(
+                url,
+                impersonate="chrome124",
+                timeout=timeout,
+                headers={
+                    "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+                    "Sec-Ch-Ua-Mobile": "?0",
+                    "Sec-Ch-Ua-Platform": '"macOS"',
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                },
+            )
+            if r.status_code == 200 and len(r.text) > 1000:
+                return r.text
+        except Exception:
+            pass
+
+    # 2. Google Chrome kuruluysa headless modda çalıştır (Yerel Mac için)
     if CHROME_PATH and os.path.exists(CHROME_PATH):
         try:
             out = subprocess.check_output(
@@ -171,7 +199,7 @@ def fetch_chrome_dom(url: str, timeout: int = 10) -> str:
         except Exception:
             pass
 
-    # 2. Chrome yoksa (örn. Render bulut sunucusu) curl ile doğrudan hızlı çek
+    # 3. Chrome yoksa (örn. Render bulut sunucusu) curl ile doğrudan hızlı çek
     try:
         out = subprocess.check_output(
             [
@@ -841,6 +869,7 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/api/debug":
             diag = {
+                "has_curl_cffi": HAS_CURL_CFFI,
                 "has_chrome": bool(CHROME_PATH and os.path.exists(CHROME_PATH)),
                 "chrome_path": CHROME_PATH,
                 "has_curl": bool(shutil.which("curl")),
